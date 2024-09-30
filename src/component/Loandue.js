@@ -7,7 +7,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit'; 
 import DeleteIcon from '@mui/icons-material/Delete'; 
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
-
+import { SearchOutlined } from '@mui/icons-material';
 const Loandue = () => {
     const [loans, setLoans] = useState([]);
     const [employees, setEmployees] = useState([]);
@@ -24,6 +24,7 @@ const Loandue = () => {
     });
     const [filterLoanId, setFilterLoanId] = useState('');
     const [filterUserId, setFilterUserId] = useState('');
+    const [expandedLoanId, setExpandedLoanId] = useState(null);
 
     useEffect(() => {
         const userId = localStorage.getItem('user_id'); // Assuming userId is stored in localStorage
@@ -160,7 +161,8 @@ const Loandue = () => {
     };
 
     const handleToggleExpand = (id) => {
-        setExpandedEmployeeId(expandedEmployeeId === id ? null : id);
+        // setExpandedEmployeeId(expandedEmployeeId === id ? null : id);
+        setExpandedLoanId(expandedLoanId === id ? null : id); // Toggle expand/collapse
     };
 
     // Filter employees based on the loan ID input
@@ -168,71 +170,164 @@ const Loandue = () => {
         employee.loan_id.toString().includes(filterLoanId)
     );
 
+     // Function to group loans by loan_id
+     const groupLoansById = (employees) => {
+        return employees.reduce((acc, employee) => {
+            if (!acc[employee.loan_id]) {
+                acc[employee.loan_id] = [];
+            }
+            acc[employee.loan_id].push(employee);
+            return acc;
+        }, {});
+    };
+
+  
+    const groupedLoans = groupLoansById(filteredEmployees);
+
     return (
         <div className="container">
             <Sidebar className="sidebar" />
             <div className="main-content">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
                 <button className="small-button" onClick={() => setShowForm(true)}>Add Loan Due</button>
 
-                 <div>
-            <div>
-                <label>Filter by Loan ID:</label>
+               
+            <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
+              
                 <input
                     type="text"
                     value={filterLoanId}
                     onChange={(e) => setFilterLoanId(e.target.value)}
                     placeholder="Enter Loan ID"
+                    style={{ padding: '5px 10px', marginRight: '10px' }}
+
                 />
+                 <SearchOutlined style={{ fontSize: '24px', cursor: 'pointer' }} />
+
             </div>
             
         </div>
 
-                <div className="table-container">
-                    {Array.isArray(filteredEmployees) && filteredEmployees.length > 0 ? (
-                        filteredEmployees.map(employee => (
-                            <div key={employee.id} className={`employee-card ${expandedEmployeeId === employee.id ? 'expanded' : ''}`}>
-                                <div className="employee-header" onClick={() => handleToggleExpand(employee.id)}>
-                                    <div className="employee-detail-item">
-                                        <span><strong>Loan ID:</strong> {employee.loan_id}</span>
-                                    </div>
-                                    <span className="employee-name">User ID: {employee.user_id}</span>
-                                    <span className={`expand-icon ${expandedEmployeeId === employee.id ? 'rotate' : ''}`}>
-                                        <DownOutlined />
-                                    </span>
-                                </div>
+        <div className="table-container">
+            {Object.keys(groupedLoans).length > 0 ? (
+                Object.keys(groupedLoans).map(loanId => (
+                    <div key={loanId} className="loan-group">
+                               <div 
+                            className="loan-header" 
+                            onClick={() => handleToggleExpand(loanId)} 
+                            style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', justifyContent: 'space-between' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <h4 style={{ margin: 0 }}>Loan ID: {loanId}</h4>
+                            </div>
 
-                                {expandedEmployeeId === employee.id && (
-                                    <div className="employee-details">
-                                        <div className="employee-detail-item">
-                                            <span><strong>Due Amount:</strong> {employee.due_amount}</span>
+                            {/* Action buttons placed near Loan ID */}
+                            <div className="employee-action-buttons" style={{ display: 'flex', alignItems: 'center' }}>
+                                <EditIcon 
+                                    style={{ color: "green", cursor: "pointer", marginLeft: '10px' }} 
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent toggling expand/collapse
+                                        handleEdit(loanId); // Pass the loanId to the edit function
+                                    }} 
+                                />
+                                <DeleteIcon 
+                                    style={{ color: "red", cursor: "pointer", marginLeft: '10px' }} 
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent toggling expand/collapse
+                                        handleDelete(loanId); // Pass the loanId to the delete function
+                                    }} 
+                                />
+                            </div>
+
+                            {/* DownOutlined icon placed at the end */}
+                            <span className={`expand-icon ${expandedLoanId === loanId ? 'rotate' : ''}`} style={{ marginLeft: '8px' }}>
+                                <DownOutlined />
+                            </span>
+                        </div>
+                        {expandedLoanId === loanId && ( // Display User IDs only if the Loan ID is expanded
+    <div className="user-list">
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+                <tr>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>User ID</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Due Amount</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Due Date</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Paid On</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Collection By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {groupedLoans[loanId].map(employee => (
+                    <tr key={employee.id} style={{ border: '1px solid #ddd' }}>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.user_id}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.due_amount}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.due_date}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.paid_on}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.collection_by}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+)}
+
+                    </div>
+                ))
+            ) : (
+                <div>No loan dues available</div>
+            )}
+        </div>
+
+        {/* <div className="table-container">
+                    {Object.keys(groupedLoans).length > 0 ? (
+                        Object.keys(groupedLoans).map(loanId => (
+                            <div key={loanId} className="loan-group">
+                                <h4>Loan ID: {loanId}</h4>
+                                
+                                {groupedLoans[loanId].map(employee => (
+                                    <div key={employee.id} className={`employee-card ${expandedEmployeeId === employee.id ? 'expanded' : ''}`}>
+                                        <div className="employee-header" onClick={() => handleToggleExpand(employee.id)}>
+                                            <span className="employee-name">User ID: {employee.user_id}</span>
+                                            { <span className={`expand-icon ${expandedEmployeeId === employee.id ? 'rotate' : ''}`}>
+                                                <DownOutlined />
+                                            </span> }
                                         </div>
-                                        <div className="employee-detail-item">
-                                            <span><strong>Due Date:</strong> {employee.due_date}</span>
-                                        </div>
-                                        <div className="employee-detail-item">
-                                            <span><strong>Paid On:</strong> {employee.paid_on}</span>
-                                        </div>
-                                        <div className="employee-detail-item">
-                                            <span><strong>Collection By:</strong> {employee.collection_by}</span>
-                                        </div>
-                                        <div className="employee-action-buttons">
-                                            <EditIcon 
-                                                style={{ color: "green", cursor: "pointer" }} 
-                                                onClick={() => handleEdit(employee)} 
-                                            />
-                                            <DeleteIcon 
-                                                style={{ color: "red", cursor: "pointer", marginLeft: '10px' }} 
-                                                onClick={() => handleDelete(employee.id)} 
-                                            />
-                                        </div>
+
+                                        {expandedEmployeeId === employee.id && (
+                                            <div className="employee-details">
+                                                <div className="employee-detail-item">
+                                                    <span><strong>Due Amount:</strong> {employee.due_amount}</span>
+                                                </div>
+                                                <div className="employee-detail-item">
+                                                    <span><strong>Due Date:</strong> {employee.due_date}</span>
+                                                </div>
+                                                <div className="employee-detail-item">
+                                                    <span><strong>Paid On:</strong> {employee.paid_on}</span>
+                                                </div>
+                                                <div className="employee-detail-item">
+                                                    <span><strong>Collection By:</strong> {employee.collection_by}</span>
+                                                </div>
+                                                <div className="employee-action-buttons">
+                                                    <EditIcon 
+                                                        style={{ color: "green", cursor: "pointer" }} 
+                                                        onClick={() => handleEdit(employee)} 
+                                                    />
+                                                    <DeleteIcon 
+                                                        style={{ color: "red", cursor: "pointer", marginLeft: '10px' }} 
+                                                        onClick={() => handleDelete(employee.id)} 
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
+                                ))}
                             </div>
                         ))
                     ) : (
                         <div>No loan dues available</div>
                     )}
-                </div>
+                </div> */}
 
                 <Dialog open={showForm} onClose={() => setShowForm(false)} fullWidth maxWidth="sm">
                     <DialogContent>
