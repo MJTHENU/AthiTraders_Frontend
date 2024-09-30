@@ -8,7 +8,7 @@ import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
-
+import { Switch } from '@mui/material';
 const Loancategory = () => {
     const [category, setcategory] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -115,6 +115,30 @@ const Loancategory = () => {
         setExpandedcategoryId(expandedcategoryId === id ? null : id);
     };
 
+    const togglecategoryStatus = async (category) => {
+        // Toggle the category's status
+        const newStatus = category.status === 'active' ? 'inactive' : 'active';
+    
+        try {
+            // Send the update request to the server
+            await Axios.put(`/loan-category/${category.category_id}`, {
+                ...category,
+                status: newStatus
+            });
+    
+            // Update local state after the server confirms the update
+            setcategory(prevCategories => 
+                prevCategories.map(c => 
+                    c.category_id === category.category_id ? { ...c, status: newStatus } : c
+                )
+            );
+    
+        } catch (error) {
+            console.error('Error updating status:', error);
+        }
+    };
+    
+    
     return (
         <div className="container">
             <Sidebar className="sidebar" />
@@ -138,7 +162,11 @@ const Loancategory = () => {
                 <div className="employee-details">
                     
                     <div className="employee-detail-item">
-                        <span>{category.status}</span>
+                    <Switch
+    checked={category.status === 'active'} // Check if status is 'active'
+    onChange={() => togglecategoryStatus(category)}
+    color="primary"
+/>
                     </div>
                     <div className="employee-action-buttons">
                         <EditIcon style={{ color: "green" }} onClick={() => handleEdit(category)} />
