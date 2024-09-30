@@ -1,0 +1,98 @@
+/* AppBar.css */
+
+.app-bar {
+    background: #188b3E !important; /* Background color */
+}
+
+.toolbar {
+    display: flex !important; /* Flexbox for toolbar */
+    justify-content: space-between !important; /* Space out items */
+    align-items: center  !important; /* Center items vertically */
+}
+
+.title {
+    flex-grow: 1; /* Allow title to grow and fill space */
+    font-size: 1.5rem; /* Adjust font size as needed */
+    color: white; /* Title text color */
+}
+
+.logo-container {
+    display: flex; /* Use flex for logo container */
+    align-items: center; /* Center logo vertically */
+    margin-left: 80px !important;
+}
+
+.logo {
+    width: 60px !important;
+    height: 60px !important; /* Set logo height */
+    margin-left: 90px !important; /* Space between logo and title */
+}
+
+.logout-button {
+    background-color:#188b3E !important;
+    width: 100px !important;
+    color: white; /* Logout button text color */
+}
+
+
+.sidebar {
+    padding-top: 50px !important;
+    width: 200px !important; /* Width of the sidebar */
+    height: 100%; /* Full height */
+    background-color: #fff !important; /* Background color */
+    color: #188b3E !important;
+}
+
+.sidebar .MuiListItemText-primary {
+    font-weight: bold; /* Bold text */
+}
+
+.sidebar .MuiListItem {
+    transition: background-color 0.3s; /* Smooth transition for hover */
+}
+
+.sidebar .MuiListItem:hover {
+    background-color: #e0e0e0; /* Change background on hover */
+}
+
+
+.sidebar {
+    width: 180px !important; /* Set your desired width for the sidebar */
+    height: 100vh; /* Full height */
+    background-color: #f4f4f4; /* Background color for the sidebar */
+}
+
+.appContent {
+    margin-left: 240px; /* Same as the width of the sidebar */
+    padding: 2px !important; /* Add some padding */
+}
+
+/* Add any other relevant styles */
+/* Sidebar.css */
+
+/* Add a class to ListItem for styling */
+.list-item {
+    display: flex; /* Make sure it displays as flex to align items */
+    align-items: center; /* Center items vertically */
+    padding: 10px 16px; /* Padding inside the list item */
+    transition: background-color 0.3s; /* Smooth background transition */
+    cursor: pointer; /* Show pointer cursor on hover */
+    
+}
+
+/* Hover effect */
+.list-item:hover {
+    background-color: #f0f0f0; /* Light background color on hover */
+}
+
+/* Style for the arrow icon */
+.arrow-icon {
+    margin-left: auto; /* Push the arrow to the far right */
+    opacity: 0; /* Hide the arrow by default */
+    transition: opacity 0.3s; /* Smooth transition for arrow visibility */
+}
+
+/* Show the arrow icon on hover */
+.list-item:hover .arrow-icon {
+    opacity: 1; /* Show the arrow icon on hover */
+}

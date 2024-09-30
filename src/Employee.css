@@ -1,0 +1,264 @@
+.error {
+    color: red;
+    font-size: 12px;
+}
+
+.table-container{
+    background-color:mediumseagreen !important;
+}
+/* Ensure flexbox is applied to .employee-details */
+.employee-details {
+    display: flex !important; /* Flexbox to align items horizontally */
+    justify-content: left; /* Center the content */
+    flex-wrap: wrap; /* Allow wrapping of items if the screen is small */
+    gap: 20px; /* Space between each field */
+    padding: 10px 0;
+    margin: 10px !important;
+}
+
+
+.employee-detail-item {
+    display: flex; 
+    flex-direction: column !important;
+    
+   
+    gap: 5px; 
+}
+
+
+.employee-action-buttons {
+    display: flex;
+    gap: 10px; 
+}
+
+
+.small-button {
+    width: 200px;
+    background-color: #188b3E;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+.small-button1 {
+    width: 100px;
+    background-color: #188b3E;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.small-button2 {
+    width: 100px;
+    background-color:crimson;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+.small-button:hover {
+    background-color: #145a2c;
+}
+.small-button1:hover {
+    background-color: #145a2c;
+}
+
+.employee-detail-item strong {
+    margin-right: 5px; /* Space between label and value */
+}
+
+.employee-action-buttons {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+/* .small-button {
+    width: 100px; 
+    background-color: #188b3E;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+} */
+
+.small-button:hover {
+    background-color: #145a2c; /* Darker shade on hover */
+}
+
+
+.expand-icon {
+    margin-left: auto; /* Push the icon to the far right */
+    width: 20px !important; /* Adjust the size as needed */
+    height: 20px !important;
+    cursor: pointer; /* Pointer on hover */
+}
+
+.container {
+    display: flex !important; /* Use flexbox for layout */
+    margin: 0px 0 0 180px !important; /* Margin around the container */
+}
+
+.sidebar {
+    width: 240px; /* Fixed width for the sidebar */
+}
+
+.main-content {
+    flex: 1; /* Allow the main content to take remaining space */
+    padding: 20px; /* Padding inside the main content */
+    margin-top: 80px;
+}
+
+h2 {
+    margin-top: 0; /* Remove default margin */
+}
+
+.table-container {
+    margin-top: 20px;
+    margin-left: 100px !important; /* Space between the title and the table */
+    overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+    max-width: 800px; /* Adjust as needed */
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column; /* Ensure form elements stack vertically */
+    max-width: 400px; /* Limit the width of the form container */
+    margin: 0 auto; /* Center the form */
+    padding: 1em; /* Add padding for better spacing */
+    border: 1px solid #ccc; /* Optional: add border */
+    border-radius: 8px; /* Optional: add rounded corners */
+    background-color: #f9f9f9; /* Light background for the form */
+}
+
+table {
+    width: 100%; /* Ensure table takes full width */
+    border-collapse: collapse;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+}
+
+th, td {
+    padding: 10px; /* Padding for table cells */
+    border: 1px solid #ccc; /* Border for table cells */
+    text-align: left; /* Align text to the left */
+}
+
+th {
+    background-color: #f4f4f4; /* Header background color */
+    color: #333; /* Darker text color for headers */
+}
+
+tr:hover {
+    background-color: #f1f1f1; /* Highlight row on hover */
+}
+
+/* .small-button {
+    width: 150px; /* Fixed button width */
+    /* background-color: #188b3E; 
+    color: white; 
+    border: none; 
+    padding: 10px 15px; 
+    cursor: pointer; 
+    border-radius: 5px; 
+    margin-right: 10px; 
+    margin-left: 100px !important; */
+/* }  */
+
+/* .small-button:hover {
+    background-color: #188b3E;
+} */
+
+label {
+    display: block; /* Block display for labels */
+    margin-bottom: 5px; /* Space below labels */
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%; /* Full width inputs */
+    padding: 8px; /* Padding for inputs */
+    margin-bottom: 15px; /* Space below inputs */
+    border: 1px solid #ccc; /* Border for inputs */
+    border-radius: 4px; /* Rounded corners for inputs */
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+select.category-type:focus {
+    border-color: #7f223d !important; 
+    outline: none !important; 
+}
+select.category-type {
+    width: 100%;
+    padding: 8px; 
+    margin-bottom: 15px;
+    border: 1px solid #ccc; 
+    border-radius: 4px;
+    background-color: #fff; 
+}
+
+
+select.category-type::after {
+    content: "▼" !important; 
+    /* position: absolute; */
+ 
+}
+
+.employee-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.employee-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ensure the name and icon are spaced apart */
+    width: 100%; /* Take the full width of the container */
+}
+
+.employee-name {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+/* .employee-details {
+    justify-content: right !important;
+    margin-top: 10px;
+    padding-left: 20px;
+} */
+
+.employee-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.expand-icon {
+    transition: transform 0.3s ease;
+}
+
+.expand-icon.rotate {
+    transform: rotate(180deg);
+}
+
+.employee-details {
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+    max-height: 0;
+}
+
+.employee-card.expanded .employee-details {
+    max-height: 300px; /* adjust based on content */
+}
