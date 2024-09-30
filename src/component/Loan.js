@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, SearchOutlined } from '@ant-design/icons'; // Import Search Icon
 
 
 const addWeeks = (date, weeks) => {
@@ -28,9 +28,10 @@ const Loan = () => {
     const [loanCategories, setLoanCategories] = useState([]);
     const [users, setUsers] = useState([]); // State to hold user list
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(""); // Search term state
     const [formData, setFormData] = useState({
         loan_id: '',
-      category_id: '',
+        category_id: '',
         user_id: '',
         loan_amount: '',
         loan_date: '',
@@ -96,15 +97,51 @@ const Loan = () => {
         }
     };
 
+    // const fetchLoan = async () => {
+    //     try {
+    //         const response = await Axios.get('/loan'); // Adjust the URL as needed
+    //         console.log(response.data); // Log the entire response to inspect it
+
+    //         // Check if loans exist and are an array
+    //         if (response.data.loans && Array.isArray(response.data.loans)) {
+    //             console.log("All Loans:", response.data.loans); // Log all loans to the console
+    //             setLoans(response.data.loans); // Set the loans state
+    //         } else {
+    //             console.error("Loans data is not an array or is undefined");
+    //         }
+    //     } catch (error) {
+    //         alert('Error fetching loan: ' + error.message);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     fetchLoan(); // Call the fetchLoan function on component mount
+    // }, []);
+    
     const fetchLoan = async () => {
         try {
-            const response = await Axios.get('/loan'); // Adjust the URL as needed
-            console.log(response.data); // Log the entire response to inspect it
-
-            // Check if loans exist and are an array
+            const response = await Axios.get('/loan'); // Fetch loans
+            console.log(response.data); // Inspect the response
+    
             if (response.data.loans && Array.isArray(response.data.loans)) {
-                console.log("All Loans:", response.data.loans); // Log all loans to the console
+                console.log("All Loans:", response.data.loans);
                 setLoans(response.data.loans); // Set the loans state
+    
+                // Fetch user details for each loan
+                const loanWithUserDetails = await Promise.all(response.data.loans.map(async (loan) => {
+                    try {
+                        const userResponse = await Axios.get(`/profile/${loan.user_id}`); 
+                        console.log(`User details for loan ${loan.id}:`, userResponse.data);
+                        return { ...loan, userDetails: userResponse.data.message }; 
+                     
+                    } catch (userError) {
+                        console.error(`Error fetching user details for loan ${loan.id}:`, userError);
+                        return { ...loan, userDetails: null }; // Handle error case, set userDetails as null
+                    }
+                }));
+    
+                // Update state with loan data along with user details
+                setLoans(loanWithUserDetails);
             } else {
                 console.error("Loans data is not an array or is undefined");
             }
@@ -112,9 +149,9 @@ const Loan = () => {
             alert('Error fetching loan: ' + error.message);
         }
     };
-
+    
     useEffect(() => {
-        fetchLoan(); // Call the fetchLoan function on component mount
+        fetchLoan(); // Fetch loans and user details when component mounts
     }, []);
     
     
@@ -246,6 +283,22 @@ const Loan = () => {
             }
         }
     };
+    // Function to handle search input
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    // Filter loans and users based on search input
+    const filteredLoans = loans.filter((loan) => {
+        const user = loan.userDetails || {};
+        const searchText = searchTerm.toLowerCase();
+        return (
+            loan.loan_id.toLowerCase().includes(searchText) || // Search in loan_id
+            (user.user_name && user.user_name.toLowerCase().includes(searchText)) || // Search in user_name
+            (user.city && user.city.toLowerCase().includes(searchText)) // Search in city
+        );
+    });
+
     
 
     const handleToggleExpand = (id) => {
@@ -255,65 +308,66 @@ const Loan = () => {
         <div className="container">
             <Sidebar className="sidebar" />
             <div className="main-content">
-                <button className="small-button" onClick={handleAdd}>Add Loan</button>
-              
-    <div className="table-container">
-        {Array.isArray(loans) && loans.length > 0 ? (
-            loans.map(loanItem => (
-                <div key={loanItem.id} className={`employee-card ${expandedLoanId === loanItem.id ? 'expanded' : ''}`}>
-                    <div className="employee-header" onClick={() => handleToggleExpand(loanItem.id)}>
-                        {/* <div>
-                            <img
-                                src={loanItem.profile_photo || 'default-image-url.jpg'} // Provide a default image if null
-                                alt="Profile"
-                                style={{
-                                    width: '50px',
-                                    height: '50px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover'
-                                }}
-                            />
-                        </div> */}
-                       
-                        <span className="employee-name">Loan ID: {loanItem.loan_id}</span>
-                       
-                        
-                        <span className={`expand-icon ${expandedLoanId === loanItem.id ? 'rotate' : ''}`}>
-                            <DownOutlined />
-                        </span>
-                    </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <button className="small-button" onClick={() => setShowForm(true)}>Add Loan</button>
 
-                    {expandedLoanId === loanItem.id && (
-                        <div className="employee-details">
-                            <div className="employee-detail-item">
-                                <span>Amount: {loanItem.loan_amount}</span>
+                    {/* Search Bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            placeholder="Search by User Name, City or Loan ID"
+                            style={{ padding: '5px 10px', marginRight: '10px' }}
+                        />
+                        <SearchOutlined style={{ fontSize: '24px', cursor: 'pointer' }} />
+                    </div>
+                </div>
+
+                {/* Loan Table */}
+                <div className="table-container">
+                    {filteredLoans.length > 0 ? (
+                        filteredLoans.map(loanItem => (
+                            <div key={loanItem.id} className={`employee-card ${expandedLoanId === loanItem.id ? 'expanded' : ''}`}>
+                                <div className="employee-header" onClick={() => setExpandedloanId(expandedLoanId === loanItem.id ? null : loanItem.id)}>
+                                    <span className="employee-name">Loan ID: {loanItem.loan_id}</span>
+                                    <span className="employee-name" style={{ marginRight: '10px' }}>
+                                        {loanItem.userDetails?.user_name || 'No username'}
+                                    </span>
+                                    <span className="employee-city">{loanItem.userDetails?.city || 'No city'}</span>
+                                    <span className={`expand-icon ${expandedLoanId === loanItem.id ? 'rotate' : ''}`}>
+                                        <DownOutlined />
+                                    </span>
+                                </div>
+
+                                {expandedLoanId === loanItem.id && (
+                                    <div className="employee-details">
+                                        <div className="employee-detail-item">
+                                            <span>Amount: {loanItem.loan_amount}</span>
+                                        </div>
+                                        <div className="employee-detail-item">
+                                            <span>Category: {loanItem.loan_category}</span>
+                                        </div>
+                                        <div className="employee-detail-item">
+                                            <span>Loan Date: {loanItem.loan_date}</span>
+                                        </div>
+                                        <div className="employee-detail-item">
+                                            <span>Closed Date: {loanItem.loan_closed_date}</span>
+                                        </div>
+                                        <div className="employee-action-buttons">
+                                            <EditIcon style={{ color: "green" }} onClick={() => handleEdit(loanItem)} />
+                                            <DeleteIcon style={{ color: "red" }} onClick={() => handleDelete(loanItem.id)} />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="employee-detail-item">
-                                <span>Category: {loanItem.loan_category}</span>
-                            </div>
-                            <div className="employee-detail-item">
-                                <span>Loan Date: {loanItem.loan_date}</span>
-                            </div>
-                            <div className="employee-detail-item">
-                                <span>Closed Date: {loanItem.loan_closed_date}</span>
-                            </div>
-                            <div className="employee-detail-item">
-                                <span>Status: {loanItem.status || 'N/A'}</span>
-                            </div>
-                            <div className="employee-action-buttons">
-                                <EditIcon style={{color: "green"}} onClick={() => handleEdit(loanItem)} />
-                                <DeleteIcon style={{color: "red"}} onClick={() => handleDelete(loanItem.id)} />
-                            </div>
-                        </div>
+                        ))
+                    ) : (
+                        <div>No loans available.</div>
                     )}
                 </div>
-            ))
-        ) : (
-            <div>No loans available.</div>
-        )}
-    </div>
-
-   
+              
+       
     
                 {/* Modal for adding/editing loan */}
                 <Dialog open={showForm} onClose={() => setShowForm(false)} fullWidth maxWidth="sm">
