@@ -2,6 +2,9 @@
 
 .app-bar {
     background: #188b3E !important; /* Background color */
+    margin-left: 200px !important; /* Push it to the right to account for the sidebar */
+    z-index: 1201 !important; /* Keep AppBar on top of Drawer */
+    position: fixed !important; /* Fix the AppBar at the top */
 }
 
 .toolbar {
@@ -25,7 +28,7 @@
 .logo {
     width: 60px !important;
     height: 60px !important; /* Set logo height */
-    margin-left: 90px !important; /* Space between logo and title */
+    margin-left:-78px !important;/* Space between logo and title */
 }
 
 .logout-button {
@@ -34,13 +37,16 @@
     color: white; /* Logout button text color */
 }
 
-
+/* Sidebar.css */
 .sidebar {
     padding-top: 50px !important;
-    width: 200px !important; /* Width of the sidebar */
-    height: 100%; /* Full height */
-    background-color: #fff !important; /* Background color */
+    width: 200px !important; /* Fixed width of the sidebar */
+    height: 100vh; /* Full height */
+    background-color: #f4f4f4 !important; /* Background color for the sidebar */
     color: #188b3E !important;
+    position: fixed; /* Fix the sidebar to the left */
+    top: 40px;
+    left: 0;
 }
 
 .sidebar .MuiListItemText-primary {
@@ -55,20 +61,11 @@
     background-color: #e0e0e0; /* Change background on hover */
 }
 
-
-.sidebar {
-    width: 180px !important; /* Set your desired width for the sidebar */
-    height: 100vh; /* Full height */
-    background-color: #f4f4f4; /* Background color for the sidebar */
-}
-
 .appContent {
-    margin-left: 240px; /* Same as the width of the sidebar */
-    padding: 2px !important; /* Add some padding */
+    margin-left: 200px; /* Same as the width of the sidebar */
+    padding: 20px !important; /* Add some padding */
+    padding-top: 80px !important; /* Add padding for the top so it doesn't overlap with the AppBar */
 }
-
-/* Add any other relevant styles */
-/* Sidebar.css */
 
 /* Add a class to ListItem for styling */
 .list-item {
@@ -77,7 +74,6 @@
     padding: 10px 16px; /* Padding inside the list item */
     transition: background-color 0.3s; /* Smooth background transition */
     cursor: pointer; /* Show pointer cursor on hover */
-    
 }
 
 /* Hover effect */

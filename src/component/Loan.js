@@ -35,6 +35,7 @@ const Loan = () => {
         user_id: '',
         loan_amount: '',
         loan_date: '',
+        total_amount: '',
         loan_closed_date: '',
         employee_id: '',
         status: 'active',
@@ -176,6 +177,7 @@ const Loan = () => {
             user_id: loan.user_id || '',             // Keep user name if it exists
             loan_amount: loan.loan_amount || '',         // Keep loan amount if it exists
             loan_date: loan.loan_date || '',             // Keep loan date if it exists
+            total_amount: loan.total_amount || '',         // Keep total amount if it exists
             loan_closed_date: loan.loan_closed_date || '', // Keep loan close date if it exists
             employee_id: loan.employee_id || '',         // Keep employee ID if it exists
             image: loan.image || '',  
@@ -193,6 +195,7 @@ const Loan = () => {
             user_id: '',             // Reset user name
             loan_amount: '',           // Reset loan amount
             loan_date: '',             // Reset loan date
+            total_amount: '',           // Reset total amount
             loan_closed_date: '',       // Reset loan close date
             employee_id: '',   
             image :'',       // Reset employee ID
@@ -350,6 +353,8 @@ const Loan = () => {
                                         </div>
                                         <div className="employee-detail-item">
                                             <span>Loan Date: {loanItem.loan_date}</span>
+                                        </div><div className="employee-detail-item">
+                                            <span>Total Amount: {loanItem.total_amount}</span>
                                         </div>
                                         <div className="employee-detail-item">
                                             <span>Closed Date: {loanItem.loan_closed_date}</span>
@@ -445,6 +450,17 @@ const Loan = () => {
                 value={formData.loan_date}
                 onChange={handleChange}
                 required
+            />
+        </div>
+
+        <div>
+            <label>Total Amount</label>
+            <input 
+                type="text" 
+                name="total_amount" 
+                value={formData.loan_amount} 
+                onChange={handleChange} 
+                required 
             />
         </div>
 

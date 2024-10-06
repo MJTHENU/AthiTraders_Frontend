@@ -9,11 +9,13 @@ import Customer  from './component/Customer';
 import Loandue from './component/Loandue';
 import Loancategory from './component/Loancategory';
 import Loan from './component/Loan';
+import ForgotPassword from './component/ForgotPassword';
 const App = () => {
     return (
         
             <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/getstarted" element={<GetStarted />} />
                 <Route path="/sidebar" element={<Sidebar />} />
                 <Route path="/admin" element={<Admin />} />
