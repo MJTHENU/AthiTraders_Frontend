@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Axios from "../Axios";
-import '../Employee.css'; // Assuming you have a CSS file for styling
+import '../component/Loan.css';
 import Sidebar from './Sidebar';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,15 +30,14 @@ const Loan = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [searchTerm, setSearchTerm] = useState(""); // Search term state
     const [formData, setFormData] = useState({
-        loan_id: '',
+        // loan_id: '',
         category_id: '',
         user_id: '',
         loan_amount: '',
         loan_date: '',
-        total_amount: '',
         loan_closed_date: '',
         employee_id: '',
-        status: 'active',
+        status: 'pending',
         image:'',
     });
     
@@ -177,10 +176,9 @@ const Loan = () => {
             user_id: loan.user_id || '',             // Keep user name if it exists
             loan_amount: loan.loan_amount || '',         // Keep loan amount if it exists
             loan_date: loan.loan_date || '',             // Keep loan date if it exists
-            total_amount: loan.total_amount || '',         // Keep total amount if it exists
             loan_closed_date: loan.loan_closed_date || '', // Keep loan close date if it exists
             employee_id: loan.employee_id || '',         // Keep employee ID if it exists
-            image: loan.image || '',  
+            // image: loan.image || '',  
             status: loan.status || 'active',             // Default to 'active' if status is not provided
         });
         
@@ -190,81 +188,71 @@ const Loan = () => {
     const handleAdd = () => {
         setEditingLoan(null);
         setFormData({
-            loan_id: '',               // Reset loan ID
+            // loan_id: '',               // Reset loan ID
             category_id: '',      // Reset loan category ID
             user_id: '',             // Reset user name
             loan_amount: '',           // Reset loan amount
             loan_date: '',             // Reset loan date
-            total_amount: '',           // Reset total amount
             loan_closed_date: '',       // Reset loan close date
             employee_id: '',   
-            image :'',       // Reset employee ID
-            status: 'active',          // Reset status to 'active'
+            // image :'',       // Reset employee ID
+            status: 'pending',          // Reset status to 'active'
         });
         
         setShowForm(true);
     };
     const handleChange = (e) => {
-        const { name, value,files } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const { name, value, files } = e.target;
 
+        if (name === 'image' || name === 'profile_photo') {
+            const file = files[0]; 
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader(); 
+        
+                reader.onloadend = () => {
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        [name]: reader.result 
+                    }));
+                };
+        
+                reader.readAsDataURL(file); 
+            }
+        }
+      
+            // Update form data for other fields
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        
+    
+        // Handle category selection
         if (name === 'category_id') {
-            // Find the selected category
             const selected = loanCategories.find(category => category.id === parseInt(value));
-            console.log("selectedCategory",selected);
+            console.log("selectedCategory", selected);
             setSelectedCategory(selected);
         }
-
+    
+        // Handle loan date calculations
         if (name === 'loan_date' && selectedCategory) {
             const loanDate = new Date(value);
             let loanCloseDate;
-        
+    
             if (selectedCategory.category_type === 'weekly') {
                 loanCloseDate = addWeeks(loanDate, selectedCategory.duration);
             } else if (selectedCategory.category_type === 'monthly') {
                 loanCloseDate = addMonths(loanDate, selectedCategory.duration);
             }
-        
+    
             setFormData((prevData) => ({
                 ...prevData,
                 loan_date: value,
                 loan_closed_date: loanCloseDate ? loanCloseDate.toISOString().split('T')[0] : ''
             }));
         }
-
-
-  
-
-        if (name === "profile_photo" && files.length > 0) {
-            const file = files[0];
-
-            // Check if the selected file is an image
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-
-                reader.onloadend = () => {
-                    // Set the profile_photo in the formData as a Base64 string
-                    setFormData((prevData) => ({
-                        ...prevData,
-                      photo: reader.result // This is the Base64 string
-                    }));
-                };
-
-                reader.readAsDataURL(file); // Convert file to Base64
-            } else {
-                console.error("Selected file is not an image.");
-                // Optionally reset the input or show an error message
-                setFormData((prevData) => ({
-                    ...prevData,
-                    photo: null // Reset or handle invalid file
-                }));
-            }
-        } 
-        
     };
+    
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -273,18 +261,19 @@ const Loan = () => {
                 await Axios.put(`/loan/${editingLoan.loan_id}`, formData);
                 alert('Loan updated successfully!');
             } else {
-                await Axios.post('/loan', formData);
+                await Axios.post('/loans', formData);
                 alert('Loan added successfully!');
             }
             setShowForm(false);
             fetchLoan(); // Refresh loan list
         } catch (error) {
             if (error.response && error.response.data.errors) {
-                alert('Error: ' + JSON.stringify(error.response.data.errors));
+                alert('Validation Error: ' + JSON.stringify(error.response.data.errors));
             } else {
                 alert('Error saving loan: ' + error.message);
             }
         }
+        
     };
     // Function to handle search input
     const handleSearchChange = (e) => {
@@ -315,7 +304,7 @@ const Loan = () => {
                     <button className="small-button" onClick={() => setShowForm(true)}>Add Loan</button>
 
                     {/* Search Bar */}
-                    <div style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
+                    <div className='searchbox' style={{ display: 'flex', alignItems: 'center', marginLeft: '10px' }}>
                         <input
                             type="text"
                             value={searchTerm}
@@ -332,6 +321,7 @@ const Loan = () => {
                     {filteredLoans.length > 0 ? (
                         filteredLoans.map(loanItem => (
                             <div key={loanItem.id} className={`employee-card ${expandedLoanId === loanItem.id ? 'expanded' : ''}`}>
+                                <div className='maincard'>
                                 <div className="employee-header" onClick={() => setExpandedloanId(expandedLoanId === loanItem.id ? null : loanItem.id)}>
                                     <span className="employee-name">Loan ID: {loanItem.loan_id}</span>
                                     <span className="employee-name" style={{ marginRight: '10px' }}>
@@ -353,8 +343,6 @@ const Loan = () => {
                                         </div>
                                         <div className="employee-detail-item">
                                             <span>Loan Date: {loanItem.loan_date}</span>
-                                        </div><div className="employee-detail-item">
-                                            <span>Total Amount: {loanItem.total_amount}</span>
                                         </div>
                                         <div className="employee-detail-item">
                                             <span>Closed Date: {loanItem.loan_closed_date}</span>
@@ -364,12 +352,16 @@ const Loan = () => {
                                             <DeleteIcon style={{ color: "red" }} onClick={() => handleDelete(loanItem.id)} />
                                         </div>
                                     </div>
+                                    
                                 )}
+                            </div>
                             </div>
                         ))
                     ) : (
                         <div>No loans available.</div>
+                        
                     )}
+                   
                 </div>
               
        
@@ -379,148 +371,145 @@ const Loan = () => {
     <DialogContent>
         <h3>{editingLoan ? 'Edit Loan' : 'Add Loan'}</h3>
         <form onSubmit={handleSubmit}>
-        <div>
-            <label>Loan Id</label>
-            <input 
-                type="text" 
-                name="loan_id" 
-                value={formData.loan_id} 
-                onChange={handleChange} 
-                required 
-            />
-        </div>
-        
-        <div>
-            <label>Loan Category</label>
-            <select
-    name="category_id" // Update to match expected backend field
-    value={formData.category_id} // Ensure this matches too
-    onChange={handleChange}
-    required
->
-    <option value="">Select a Category</option>
-    {loanCategories.map((category) => (
-        <option key={category.id} value={category.id}>
-            {category.category_name}
-        </option>
-    ))}
-</select>
+            {/* <div>
+                <label>Loan Id</label>
+                <input 
+                    type="text" 
+                    name="loan_id" 
+                    value={formData.loan_id} 
+                    onChange={handleChange} 
+                    required 
+                    className="form-field" 
+                />
+            </div> */}
+            
+            <div>
+                <label>Loan Category</label>
+                <select
+                    name="category_id" // Update to match expected backend field
+                    value={formData.category_id} // Ensure this matches too
+                    onChange={handleChange}
+                    required
+                    className="form-field" // Add a class for styling
+                >
+                    <option value="">Select a Category</option>
+                    {loanCategories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                            {category.category_name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-        </div>
+            <div>
+                <label>Customer Name</label>
+                <select
+                    name="user_id"  
+                    value={formData.user_id}  
+                    onChange={handleChange}  
+                    required
+                    className="form-field" // Add a class for styling
+                >
+                    <option value="">Select a Customer</option>
+                    {users.length > 0 ? (
+                        users
+                            .filter(user => user.user_type === 'user') // Filter by user_type
+                            .map((user) => (
+                                <option key={user.id} value={user.user_id}>
+                                    {user.user_name}
+                                </option>
+                            ))
+                    ) : (
+                        <option disabled>No Users Available</option>
+                    )}
+                </select>
+            </div>
 
-        <div>
-    <label>Customer Name</label>
-    <select
-        name="user_id"  
-        value={formData.user_id}  
-        onChange={handleChange}  
-        required
-    >
-        <option value="">Select a Customer</option>
-        {users.length > 0 ? (
-            users
-            .filter(user => user.user_type === 'user') // Filter by user_type
-            .map((user) => (
-                <option key={user.id} value={user.user_id}>
-                    {user.user_name}
-                </option>
-            ))
-        ) : (
-            <option disabled>No Users Available</option>
-        )}
-    </select>
-</div>
+            <div>
+                <label>Loan Amount</label>
+                <input 
+                    type="text" 
+                    name="loan_amount" 
+                    value={formData.loan_amount} 
+                    onChange={handleChange} 
+                    required 
+                    className="form-field" // Add a class for styling
+                />
+            </div>
 
-        <div>
-            <label>Loan Amount</label>
-            <input 
-                type="text" 
-                name="loan_amount" 
-                value={formData.loan_amount} 
-                onChange={handleChange} 
-                required 
-            />
-        </div>
+            <div>
+                <label>Issue Date</label>
+                <input
+                    type="date"
+                    name="loan_date"
+                    value={formData.loan_date}
+                    onChange={handleChange}
+                    required
+                    className="form-field" // Add a class for styling
+                />
+            </div>
 
-        <div>
-            <label>Select Loan Date</label>
-            <input
-                type="date"
-                name="loan_date"
-                value={formData.loan_date}
-                onChange={handleChange}
-                required
-            />
-        </div>
+            <div>
+                <label>Loan Close Date</label>
+                <input
+                    type="date"
+                    name="loan_closed_date"
+                    value={formData.loan_closed_date}
+                    onChange={handleChange}
+                    required
+                    readOnly // Make this read-only if it's auto-calculated
+                    className="form-field" // Add a class for styling
+                />
+            </div>
 
-        <div>
-            <label>Total Amount</label>
-            <input 
-                type="text" 
-                name="total_amount" 
-                value={formData.loan_amount} 
-                onChange={handleChange} 
-                required 
-            />
-        </div>
+            <div>
+                <label>Employee Id</label>
+                <input 
+                    type="text" 
+                    name="employee_id" 
+                    value={formData.employee_id}
+                    onChange={handleChange} 
+                    required 
+                    className="form-field" // Add a class for styling
+                />
+            </div>
 
-        <div>
-            <label>Loan Close Date</label>
-            <input
-                type="date"
-                name="loan_closed_date"
-                value={formData.loan_closed_date}
-                onChange={handleChange}
-                required
-                readOnly // Make this read-only if it's auto-calculated
-            />
-        </div>
+            <div>
+                <label>Status</label>
+                <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    required
+                    className="form-field" // Add a class for styling
+                >
+                    <option value="pending">Pending</option>
+                    <option value="inprogress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="preclose">Preclose</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
 
-        <div>
-            <label>Employee Id</label>
-            <input 
-                type="text" 
-                name="employee_id" 
-                value={formData.employee_id}
-                onChange={handleChange} 
-                required 
-            />
-        </div>
+            <div>
+                <label>Transaction Proof:</label>
+                <input type="file" name="image" onChange={handleChange} accept="image/*" />
+            </div>
 
-        <div>
-            <label>Status</label>
-                        <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                required
+            <button type="submit" className="small-button">
+                {editingLoan ? 'Update' : 'Add'}
+            </button>
+            <button 
+                type="button" 
+                className="small-button" 
+                onClick={() => setShowForm(false)}
             >
-                 <option value="pending">Pending</option>
-                <option value="inprogress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-
-        </div>
-
-        <div>
-         <label> Photo:</label>
-          <input type="file" name="photo" onChange={handleChange} accept="image/*" />
-          </div>
-
-        <button type="submit" className="small-button">
-            {editingLoan ? 'Update' : 'Add'}
-        </button>
-        <button 
-            type="button" 
-            className="small-button" 
-            onClick={() => setShowForm(false)}
-        >
-            Cancel
-        </button>
-    </form>
+                Cancel
+            </button>
+        </form>
     </DialogContent>
 </Dialog>
+
 
             </div>
         </div>

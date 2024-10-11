@@ -8,7 +8,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete'; 
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import { SearchOutlined } from '@mui/icons-material';
-const Loandue = () => {
+import AddIcon from '@mui/icons-material/Add';
+import '../loandue.css';
+
+
+const Loandue = (initialGroupedLoans) => {
     const [loans, setLoans] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -25,6 +29,18 @@ const Loandue = () => {
     const [filterLoanId, setFilterLoanId] = useState('');
     const [filterUserId, setFilterUserId] = useState('');
     const [expandedLoanId, setExpandedLoanId] = useState(null);
+     const [LoansGroup, setLoansGroup] = useState(initialGroupedLoans);
+    console.log(filterLoanId); // Check if this has the expected value
+
+const filteredEmployees = (employees ?? []).filter(employee =>
+    employee.loan_id?.toString().includes(filterLoanId)
+);
+
+console.log(filteredEmployees); // Check the filtered data
+
+    
+    
+    
 
     useEffect(() => {
         const userId = localStorage.getItem('user_id'); // Assuming userId is stored in localStorage
@@ -32,6 +48,7 @@ const Loandue = () => {
             setFormData((prevData) => ({
                 ...prevData,
                 collection_by: userId, // Set reference user ID from localStorage
+                
             }));
         }
     }, []);
@@ -39,11 +56,13 @@ const Loandue = () => {
     const fetchEmployees = async () => {
         try {
             const response = await Axios.get('/loan-due');
-            setEmployees(response.data.message);
+            setEmployees(response.data.data);  // Set the correct data array
+            console.log("loandue", response.data.data);
         } catch (error) {
-            // alert('Error fetching loandue: ' + error.message);
+            console.error('Error fetching loandue:', error.message);  // Log the error to see if something goes wrong
         }
     };
+    
 
     useEffect(() => {
         fetchEmployees();
@@ -63,13 +82,13 @@ const Loandue = () => {
     }, []);
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this employee?')) {
+        if (window.confirm('Are you sure you want to delete this loan due?')) {
             try {
-                await Axios.delete(`employees/${id}`);
+                await Axios.delete(`loan-due/${id}`);
                 setEmployees(employees.filter(employee => employee.id !== id));
-                alert('Employee deleted successfully!');
+                alert('loandue deleted successfully!');
             } catch (error) {
-                alert('Error deleting employee: ' + error.message);
+                alert('Error deleting loandue: ' + error.message);
             }
         }
     };
@@ -165,24 +184,63 @@ const Loandue = () => {
         setExpandedLoanId(expandedLoanId === id ? null : id); // Toggle expand/collapse
     };
 
-    // Filter employees based on the loan ID input
-    const filteredEmployees = employees.filter(employee =>
-        employee.loan_id.toString().includes(filterLoanId)
-    );
+    // // Filter employees based on the loan ID input
+    // const filteredEmployees = employees.filter(employee =>
+    //     employee.loan_id.toString().includes(filterLoanId)
+    // );
 
      // Function to group loans by loan_id
-     const groupLoansById = (employees) => {
-        return employees.reduce((acc, employee) => {
-            if (!acc[employee.loan_id]) {
-                acc[employee.loan_id] = [];
+     function groupLoansById(employees) {
+        console.log(employees); // Check if employees are being passed to this function
+        return employees.reduce((groups, employee) => {
+            const { loan_id } = employee;
+            if (!groups[loan_id]) {
+                groups[loan_id] = [];
             }
-            acc[employee.loan_id].push(employee);
-            return acc;
+            groups[loan_id].push(employee);
+            return groups;
         }, {});
-    };
-
+    }
+    
   
     const groupedLoans = groupLoansById(filteredEmployees);
+    console.log(groupedLoans);
+
+    const handleUpdateLoan = async (loanId, dueDate, status, paidAmount, paidOn) => {
+        try {
+            const response = await Axios.put(`/loan_due/${loanId}/${dueDate}/${status}`, {
+                paid_amount: paidAmount,
+                paid_on: paidOn,
+            });
+            console.log('Loan updated successfully:', response.data);
+            // Optionally, refresh data or update local state here
+        } catch (error) {
+            console.error('Error updating loan:', error);
+        }
+    };
+
+    const handleInputChange = (loanId, employee, field, value) => {
+        // Update state without mutating the original employee object
+        const updatedEmployee = { ...employee, [field]: value };
+
+        // Update the groupedLoans state
+        setLoansGroup((prev) => {
+            const updatedLoans = { ...prev };
+            updatedLoans[loanId] = updatedLoans[loanId].map(emp => 
+                emp.id === employee.id ? updatedEmployee : emp
+            );
+            return updatedLoans;
+        });
+
+        // Call the API to update the loan whenever any of the fields are changed
+        handleUpdateLoan(
+            updatedEmployee.loan_id,
+            updatedEmployee.due_date,
+            updatedEmployee.status,
+            updatedEmployee.paid_amount,
+            updatedEmployee.paid_on
+        );
+    };
 
     return (
         <div className="container">
@@ -213,7 +271,7 @@ const Loandue = () => {
             {Object.keys(groupedLoans).length > 0 ? (
                 Object.keys(groupedLoans).map(loanId => (
                     <div key={loanId} className="loan-group">
-                               <div 
+                        <div 
                             className="loan-header" 
                             onClick={() => handleToggleExpand(loanId)} 
                             style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', justifyContent: 'space-between' }}
@@ -222,187 +280,193 @@ const Loandue = () => {
                                 <h4 style={{ margin: 0 }}>Loan ID: {loanId}</h4>
                             </div>
 
-                            {/* Action buttons placed near Loan ID */}
                             <div className="employee-action-buttons" style={{ display: 'flex', alignItems: 'center' }}>
-                                <EditIcon 
+                                {/* <AddIcon 
                                     style={{ color: "green", cursor: "pointer", marginLeft: '10px' }} 
                                     onClick={(e) => {
-                                        e.stopPropagation(); // Prevent toggling expand/collapse
-                                        handleEdit(loanId); // Pass the loanId to the edit function
+                                        e.stopPropagation(); 
+                                        // Add any additional logic if needed
                                     }} 
-                                />
-                                <DeleteIcon 
+                                /> */}
+                                {/* <DeleteIcon 
                                     style={{ color: "red", cursor: "pointer", marginLeft: '10px' }} 
                                     onClick={(e) => {
-                                        e.stopPropagation(); // Prevent toggling expand/collapse
-                                        handleDelete(loanId); // Pass the loanId to the delete function
+                                        e.stopPropagation(); 
+                                        handleDelete(loanId); 
                                     }} 
-                                />
+                                /> */}
                             </div>
 
-                            {/* DownOutlined icon placed at the end */}
                             <span className={`expand-icon ${expandedLoanId === loanId ? 'rotate' : ''}`} style={{ marginLeft: '8px' }}>
                                 <DownOutlined />
                             </span>
                         </div>
-                        {expandedLoanId === loanId && ( // Display User IDs only if the Loan ID is expanded
-    <div className="user-list">
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-                <tr>
-                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>User ID</th>
-                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Due Amount</th>
-                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Due Date</th>
-                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Paid On</th>
-                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Collection By</th>
-                </tr>
-            </thead>
-            <tbody>
-                {groupedLoans[loanId].map(employee => (
-                    <tr key={employee.id} style={{ border: '1px solid #ddd' }}>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.user_id}</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.due_amount}</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.due_date}</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.paid_on}</td>
-                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{employee.collection_by}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-)}
-
+                        {expandedLoanId === loanId && groupedLoans[loanId] ? ( 
+                            <div className="user-list">
+                                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                                    <thead>
+                                        <tr>
+                                            <th>User ID</th>
+                                            <th>Due Amount</th>
+                                            <th>Paid Amount</th>
+                                            <th>Due Date</th>
+                                            <th>Paid Date</th>
+                                            <th>Status</th>
+                                            <th>Collection By</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {groupedLoans[loanId].map(employee => (
+                                            <tr key={employee.id}>
+                                                <td>{employee.user_id}</td>
+                                                <td>{employee.due_amount}</td>
+                                                <td>
+                                                    <input
+                                                        type="number"
+                                                        value={employee.paid_amount || ''}
+                                                        min="0" 
+                                                        step="0.01"
+                                                        className="input-number"
+                                                        // onChange={(e) => handleInputChange(loanId, employee, 'paid_amount', e.target.value)}
+                                                    />
+                                                </td>
+                                                <td>{employee.due_date}</td>
+                                                <td>
+                                                    {employee.paid_date ? (
+                                                        employee.paid_date
+                                                    ) : (
+                                                        <input
+                                                            type="date"
+                                                            style={{ cursor: 'pointer' }}
+                                                            // onChange={(e) => handleInputChange(loanId, employee, 'paid_date', e.target.value)}
+                                                        />
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    <select
+                                                        value={employee.paid_on || 'Unpaid'}
+                                                        style={{ cursor: 'pointer' }}
+                                                        className="status-select"
+                                                        // onChange={(e) => handleInputChange(loanId, employee, 'paid_on', e.target.value)}
+                                                    >
+                                                        <option value="Paid">Paid</option>
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="Unpaid">Unpaid</option>
+                                                    </select>
+                                                </td>
+                                                <td>{employee.collection_by}</td>
+                                              
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : null}
                     </div>
                 ))
             ) : (
-                <div>No loan dues available</div>
+                <p>No loans found.</p>
             )}
         </div>
 
-        {/* <div className="table-container">
-                    {Object.keys(groupedLoans).length > 0 ? (
-                        Object.keys(groupedLoans).map(loanId => (
-                            <div key={loanId} className="loan-group">
-                                <h4>Loan ID: {loanId}</h4>
-                                
-                                {groupedLoans[loanId].map(employee => (
-                                    <div key={employee.id} className={`employee-card ${expandedEmployeeId === employee.id ? 'expanded' : ''}`}>
-                                        <div className="employee-header" onClick={() => handleToggleExpand(employee.id)}>
-                                            <span className="employee-name">User ID: {employee.user_id}</span>
-                                            { <span className={`expand-icon ${expandedEmployeeId === employee.id ? 'rotate' : ''}`}>
-                                                <DownOutlined />
-                                            </span> }
-                                        </div>
+        {showForm && (
+            <Dialog open={showForm} onClose={() => setShowForm(false)}>
+                <DialogTitle>{editingEmployee ? 'Edit Loan Due' : 'Add Loan Due'}</DialogTitle>
+                <DialogContent>
+    <form onSubmit={handleSubmit}>
+    <div className="form-group">
+    <label>Loan ID</label>
+    <select
+        name="loan_id"
+        value={formData.loan_id}
+        onChange={handleLoanChange}
+        placeholder="Loan ID"
+    >
+        <option value="">Select Loan ID</option>
+        {loans.map((loan) => (
+            <option key={loan.id} value={loan.loan_id}>
+                {loan.loan_id}
+            </option>
+        ))}
+    </select>
+</div>
 
-                                        {expandedEmployeeId === employee.id && (
-                                            <div className="employee-details">
-                                                <div className="employee-detail-item">
-                                                    <span><strong>Due Amount:</strong> {employee.due_amount}</span>
-                                                </div>
-                                                <div className="employee-detail-item">
-                                                    <span><strong>Due Date:</strong> {employee.due_date}</span>
-                                                </div>
-                                                <div className="employee-detail-item">
-                                                    <span><strong>Paid On:</strong> {employee.paid_on}</span>
-                                                </div>
-                                                <div className="employee-detail-item">
-                                                    <span><strong>Collection By:</strong> {employee.collection_by}</span>
-                                                </div>
-                                                <div className="employee-action-buttons">
-                                                    <EditIcon 
-                                                        style={{ color: "green", cursor: "pointer" }} 
-                                                        onClick={() => handleEdit(employee)} 
-                                                    />
-                                                    <DeleteIcon 
-                                                        style={{ color: "red", cursor: "pointer", marginLeft: '10px' }} 
-                                                        onClick={() => handleDelete(employee.id)} 
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        ))
-                    ) : (
-                        <div>No loan dues available</div>
-                    )}
-                </div> */}
+        
+<div className="form-group">
+    <label>User ID</label>
+    <select
+        name="user_id"
+        value={formData.user_id}
+        onChange={handleUserChange}
+       
+    >
+        <option value="">Select User ID</option>
+        {loans.map((loan) => (
+            <option key={loan.user_id} value={loan.user_id}>
+                {loan.user_id}
+            </option>
+        ))}
+    </select>
+</div>
 
-                <Dialog open={showForm} onClose={() => setShowForm(false)} fullWidth maxWidth="sm">
-                    <DialogContent>
-                        <h3>{editingEmployee ? 'Edit Loan Due' : 'Add Loan Due'}</h3>
-                        <form onSubmit={handleSubmit}>
-                            <div>
-                                <label>Loan ID</label>
-                                <select
-                                    name="loan_id"
-                                    value={formData.loan_id}
-                                    onChange={handleLoanChange} // Update loan_id and user_id when loan is selected
-                                    required
-                                >
-                                    <option value="">Select Loan</option>
-                                    {loans.map(loan => (
-                                        <option key={loan.loan_id} value={loan.loan_id}>
-                                            {loan.loan_id}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label>User ID</label>
-                                <select
-                                    name="loan_id"
-                                    value={formData.user_id}
-                                    onChange={handleUserChange} // Update loan_id and user_id when loan is selected
-                                    required
-                                >
-                                    <option value="">Select User</option>
-                                    {loans.map(user => (
-                                        <option key={user.user_id} value={user.user_id}>
-                                            {user.user_id}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label>Due Amount</label>
-                                <input
-                                    type="text"
-                                    name="due_amount"
-                                    value={formData.due_amount}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label>Due Date</label>
-                                <input
-                                    type="date"
-                                    name="due_date"
-                                    value={formData.due_date}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label>Paid On</label>
-                                <input
-                                    type="date"
-                                    name="paid_on"
-                                    value={formData.paid_on}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <DialogActions>
-                                <Button onClick={() => setShowForm(false)} color="primary">Cancel</Button>
-                                <Button type="submit" color="primary">{editingEmployee ? 'Update' : 'Add'}</Button>
-                            </DialogActions>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-            </div>
+        
+        <div className="form-group">
+            <label>Due Amount</label>
+            <input
+                type="number"
+                name="due_amount"
+                value={formData.due_amount}
+                onChange={handleChange}
+                placeholder="Due Amount"
+            />
         </div>
+        <div className="form-group">
+            <label>Paid Amount</label>
+            <input
+                type="number"
+                name="paid_amount"
+                value={formData.due_amount}
+                onChange={handleChange}
+                placeholder="Due Amount"
+            />
+        </div>
+        
+        <div className="form-group">
+            <label>Due Date</label>
+            <input
+                type="date"
+                name="due_date"
+                value={formData.due_date}
+                onChange={handleChange}
+                placeholder="Due Date"
+            />
+        </div>
+        
+        <div className="form-group">
+            <label>Paid On</label>
+            <input
+                type="date"
+                name="paid_on"
+                value={formData.paid_on}
+                onChange={handleChange}
+                placeholder="Paid On"
+            />
+        </div>
+        
+        <DialogActions>
+            <Button onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button type="submit" color="primary">
+                {editingEmployee ? 'Update' : 'Add'}
+            </Button>
+        </DialogActions>
+    </form>
+</DialogContent>
+
+            </Dialog>
+        )}
+    </div>
+</div>
     );
 };
 

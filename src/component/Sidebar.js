@@ -1,66 +1,88 @@
-import React from 'react';
-import { List, ListItem, ListItemText, Drawer, AppBar, Toolbar, Button } from '@mui/material';
+import React, { useState } from 'react';
+import { List, ListItem, ListItemText, Drawer, AppBar, Toolbar, Button, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { Person, People, CardGiftcard, Star, Savings, ArrowForward } from '@mui/icons-material'; // Import necessary icons
+import { Person, People, CardGiftcard, Star, Savings, ArrowForward, Menu, Close ,Dashboard,EventAvailable} from '@mui/icons-material'; // Add Close icon
+import { useMediaQuery } from '@mui/material';
 import '../Sidebar.css'; // Import your CSS for additional styling
 import logoImage from '../asset/AT Logo White.png'; 
 import Swal from 'sweetalert2';
+
 const Sidebar = () => {
     const navigate = useNavigate();
+    const [isDrawerOpen, setDrawerOpen] = useState(false); // State for Drawer toggle
+    const isMobile = useMediaQuery('(max-width: 768px)'); // Check if screen is smaller (mobile)
 
     const menuItems = [
-        { text: 'Employee', path: '/employee', icon: <People /> }, // People icon for Employee
-        { text: 'Customer', path: '/customer', icon: <Person /> }, // Single person icon for Customer
-        { text: 'Loan Category', path: '/loancategory', icon: <Star /> }, // Star icon for Promotion
-        { text: 'Loan', path: '/loan', icon: <CardGiftcard /> }, // Card icon for My Cards
-     
-      
-        { text: 'Loan Due', path: '/loandue', icon: <Savings /> }, // Savings icon for Savings
+        { text: 'Dashboard', path: '/admindashboard', icon:<Dashboard/>  },
+        { text: 'Employee', path: '/employee', icon: <People /> },
+        { text: 'Customer', path: '/customer', icon: <Person /> },
+        { text: 'Loan Category', path: '/loancategory', icon: <Star /> },
+        { text: 'Loan', path: '/loan', icon: <CardGiftcard /> },
+        { text: 'Loan Due', path: '/loandue', icon: <Savings /> },
+        { text: 'Today Loan Due', path: '/todayloandue', icon: <EventAvailable /> }, 
     ];
 
     const handleNavigation = (path) => {
         navigate(path);
+        if (isMobile) {
+            setDrawerOpen(false); // Close drawer on mobile after navigation
+        }
     };
 
     const handleLogout = () => {
         Swal.fire({
-          title: 'Are you sure?',
-          text: "Do you really want to log out?",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#188b3E',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, logout',
-          cancelButtonText: 'No, stay'
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            localStorage.clear();
-    
-            Swal.fire(
-              'Logged out!',
-              'You have been logged out successfully.',
-              'success'
-            );
-    
-            navigate("/login");
-          }
+            title: 'Are you sure?',
+            text: "Do you really want to log out?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#188b3E',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout',
+            cancelButtonText: 'No, stay'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.clear();
+                Swal.fire(
+                    'Logged out!',
+                    'You have been logged out successfully.',
+                    'success'
+                );
+                navigate("/login");
+            }
         });
-      };
-    
+    };
+
+    const toggleDrawer = () => {
+        setDrawerOpen(!isDrawerOpen);
+    };
+
     return (
         <div>
+            {/* AppBar for header */}
             <AppBar position="fixed" className="app-bar">
                 <Toolbar className="toolbar">
                     <div className="logo-container">
-                       
-                        <img src={logoImage} alt="Logo" className="logo" /> {/* Replace with your logo path */}
+                        <img src={logoImage} alt="Logo" className="logo" />
                     </div>
-                    <Button color="inherit" onClick={handleLogout} className="logout-button">
-                        Logout
-                    </Button>
+                    {isMobile ? (
+                        <IconButton color="inherit" onClick={toggleDrawer}>
+                            {isDrawerOpen ? <Close /> : <Menu />} {/* Toggle between Menu and Close Icon */}
+                        </IconButton>
+                    ) : (
+                        <Button color="inherit" onClick={handleLogout} className="logout-button">
+                            Logout
+                        </Button>
+                    )}
                 </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" anchor="left">
+
+            {/* Sidebar Drawer */}
+            <Drawer
+                variant={isMobile ? "temporary" : "permanent"} // Use temporary for mobile, permanent for larger screens
+                open={isDrawerOpen || !isMobile} // If mobile, control drawer with state
+                onClose={toggleDrawer} // Close the drawer when toggled
+                anchor="left"
+            >
                 <div className="sidebar">
                     <List>
                         {menuItems.map((item, index) => (

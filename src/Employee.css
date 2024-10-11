@@ -3,9 +3,7 @@
     font-size: 12px;
 }
 
-.table-container{
-    background-color:mediumseagreen !important;
-}
+
 /* Ensure flexbox is applied to .employee-details */
 .employee-details {
     display: flex !important; /* Flexbox to align items horizontally */
@@ -121,12 +119,7 @@ h2 {
     margin-top: 0; /* Remove default margin */
 }
 
-.table-container {
-    margin-top: 20px;
-    margin-left: 100px !important; /* Space between the title and the table */
-    overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
-    max-width: 800px; /* Adjust as needed */
-}
+
 
 .form-container {
     display: flex;
@@ -136,13 +129,125 @@ h2 {
     padding: 1em; /* Add padding for better spacing */
     border: 1px solid #ccc; /* Optional: add border */
     border-radius: 8px; /* Optional: add rounded corners */
-    background-color: #f9f9f9; /* Light background for the form */
+    background-color: #f9f9f9 !important; /* Light background for the form */
 }
 
-table {
-    width: 100%; /* Ensure table takes full width */
-    border-collapse: collapse;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+
+
+.loan-group {
+    background-color:mediumseagreen !important; /* White background */
+    margin-bottom: 20px; /* Space between loan groups */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.loan-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.loan-header h4 {
+    color: green; /* Loan ID in green color */
+    margin: 0;
+}
+
+
+.form-group {
+    margin-bottom: 15px;
+    width: 500px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.table-container {
+    width: 100%;
+     margin-top: 20px;
+    margin-left: 100px !important; /* Space between the title and the table */
+     overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+      max-width: 800px; /* Adjust as needed */
+     background-color:white !important;
+            }
+     
+            
+ .table-container-loandue {
+     width: 100%;
+      margin-top: 20px;
+      margin-left: 100px !important; /* Space between the title and the table */
+       overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+        max-width: 800px; /* Adjust as needed */
+       background-color:#ffffff!important;
+          }
+
+.loan-group {
+    background-color:mediumseagreen; /* White background */
+    margin-bottom: 20px; /* Space between loan groups */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.loan-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    color: #188b3E !important;
+}
+
+.loan-header h4 {
+    color:#ffffff; /* Loan ID in green color */
+    margin: 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Space between rows */
+}
+
+.table-header {
+    border: 1px solid #ddd;
+    padding: 8px;
+    background-color:bisque; /* Header background color */
+    color: #333; /* Dark text color */
+}
+
+.table-cell {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.table-row {
+    background-color: #fff;
+}
+
+.table-row:hover {
+    background-color: #f1f1f1; /* Highlight row on hover */
+}
+
+.expand-icon {
+    margin-left: 8px;
+}
+
+.rotate {
+    transform: rotate(180deg); /* Rotate icon when expanded */
 }
 
 th, td {
@@ -159,6 +264,7 @@ th {
 tr:hover {
     background-color: #f1f1f1; /* Highlight row on hover */
 }
+
 
 /* .small-button {
     width: 150px; /* Fixed button width */
@@ -213,7 +319,7 @@ select.category-type::after {
 }
 
 .employee-card {
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     padding: 10px;
     margin: 10px 0;
     border-radius: 5px;
@@ -226,6 +332,12 @@ select.category-type::after {
     justify-content: space-between; /* Ensure the name and icon are spaced apart */
     width: 100%; /* Take the full width of the container */
 }
+
+  .maincard {
+    background-color: mediumseagreen !important;
+    border-radius: 20px;
+  }
+  
 
 .employee-name {
     margin-left: 10px;
@@ -261,4 +373,55 @@ select.category-type::after {
 
 .employee-card.expanded .employee-details {
     max-height: 300px; /* adjust based on content */
+}
+
+/* profile and nominee photo */
+.customer-nominee-container {
+    display: flex;
+    justify-content: space-between; /* Align the two sections side by side */
+    gap: 10px; /* Space between the two sections */
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.customer-section, .nominee-section {
+    flex: 1; /* Equal width for both sections */
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+input[type="file"] {
+    display: block;
+    width: 100%;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    .customer-nominee-container {
+        flex-direction: column; /* Stack sections vertically on small screens */
+    }
+
+    .customer-section, .nominee-section {
+        width: 100%; /* Full width for each section */
+    }
 }

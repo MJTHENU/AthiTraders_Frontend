@@ -27,11 +27,11 @@ const Login = () => {
     
             const response = await Axios.post('/login', loginData);
     
-            Swal.fire({
-                icon: 'success',
-                title: 'Login Successful',
-                text: `Welcome, ${response.data.name}`,
-            });
+            // Swal.fire({
+            //     icon: 'success',
+            //     title: 'Login Successful',
+            //     text: `Welcome, ${response.data.name}`,
+            // });
     
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user_id', response.data.user_id);
@@ -46,8 +46,8 @@ const Login = () => {
                             
                             if (userProfileData) {
                                 console.log("User profile data:", userProfileData);
-                                localStorage.setItem('ref_name', response.data.message.user_name);
-                                localStorage.setItem('ref_aadhar_number', response.data.message.aadhar_number);
+                                // localStorage.setItem('ref_name', response.data.message.user_name);
+                                // localStorage.setItem('ref_aadhar_number', response.data.message.aadhar_number);
                             }
                         } catch (err) {
                             console.error("Error occurred in fetching user profile", err);
@@ -57,7 +57,7 @@ const Login = () => {
 
             // Navigate based on user role
             if (response.data.role === 'admin') {
-                navigate('/employee');
+                navigate('/admindashboard');
             } else {
                 navigate('/dashboard');
             }
@@ -88,8 +88,8 @@ const Login = () => {
                 <img src={logoImage} alt="Athi Traders Logo" className="logo1" />
                 <h2>Sign In</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="email">User Id</label>
+                    <div className="form-group-login">
+                        <label htmlFor="email">Employee Id</label>
                         <input
                           
                             id="email"
@@ -100,7 +100,7 @@ const Login = () => {
                             autoComplete="email"
                         />
                     </div>
-                    <div className="form-group">
+                    <div className="form-group-login">
                         <label htmlFor="password">Password</label>
                         <input
                             type="password"
@@ -113,7 +113,7 @@ const Login = () => {
                         />
                     </div>
 
-                    <div className="forgot-password">
+                    <div className="forgot-password-login">
                         <a href="/forgot-password">Forgot Password?</a>
                     </div>
 

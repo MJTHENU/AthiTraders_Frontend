@@ -147,6 +147,7 @@ const Loancategory = () => {
                 <button className="small-button" onClick={handleAdd}>Add  Loan Categry</button>
                 <div className="table-container">
     {Array.isArray(category) && category.map(category => (
+        <div className='maincard'>
         <div key={category.id} className={`employee-card ${expandedcategoryId === category.id ? 'expanded' : ''}`}>
             <div className="employee-header" onClick={() => handleToggleExpand(category.id)}>
             
@@ -174,6 +175,7 @@ const Loancategory = () => {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     ))}
 </div>
@@ -213,10 +215,10 @@ const Loancategory = () => {
         required
         className="category-type"
     >
-        <option value="" disabled>Select Category Type</option>
-        <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
-        <option value="daily">Daily</option>
+         {/* <option value="" disabled>Select Category Type</option> */}
+    <option value="weekly" selected>Weekly</option>
+    <option value="monthly">Monthly</option>
+    <option value="daily">Daily</option>
     </select>
 </div>
 

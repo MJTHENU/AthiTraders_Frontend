@@ -29,14 +29,17 @@ const Customer = () => {
         password: '',
         confirmPassword: '', // Added confirm password
         added_by: '',
-        profile_photo: null, // For profile photo
+       
         designation: '', // Designation
         landmark: '', // Landmark
         alter_mobile_number: '', // Alternate Number
         ref_name: '', 
         ref_user_id: '', // Reference User ID
         ref_aadhar_number: '', // Reference Aadhar Number
+        profile_photo: null, // For profile photo
         sign_photo: null, // For signature photo
+        nominee_photo: null, // For profile photo
+        nominee_sign: null, // For signature photo
     });
     const [expandedcustomerId, setExpandedcutomerId] = useState(null); 
     const [errors, setErrors] = useState({});
@@ -48,7 +51,7 @@ const Customer = () => {
                 added_by: userId,
                 ref_user_id: userId,
             }));
-            fetchUserProfile(userId);
+            // fetchUserProfile(userId);
         }
     }, []);
 
@@ -78,38 +81,38 @@ const Customer = () => {
         }
     };
 
-    const fetchUserProfile = async () => {
-        try {
-            // Get the user ID from localStorage
-            const loggedInUserId = localStorage.getItem('user_id'); 
-            console.log("Which user is logged in:", loggedInUserId);
+    // const fetchUserProfile = async () => {
+    //     try {
+           
+    //         const loggedInUserId = localStorage.getItem('user_id'); 
+    //         console.log("Which user is logged in:", loggedInUserId);
     
-            // Fetch user profile data from the API
-            const response = await Axios.get(`/profile/${loggedInUserId}`);
-            const userProfileData = response.data.message;
             
-            if (userProfileData) {
-                console.log("User profile data:", userProfileData);
-                console.log("User profile data username:", userProfileData.user_name);
+    //         const response = await Axios.get(`/profile/${loggedInUserId}`);
+    //         const userProfileData = response.data.message;
+            
+    //         if (userProfileData) {
+    //             console.log("User profile data:", userProfileData);
+    //             console.log("User profile data username:", userProfileData.user_name);
                 
-                setFormData((prevData) => ({
-                    ...prevData,
-                    ref_name: userProfileData.user_name || prevData.ref_name, // Set ref_name
-                    ref_aadhar_number: userProfileData.aadhar_number || prevData.ref_aadhar_number, // Set ref_aadhar_number
+    //             setFormData((prevData) => ({
+    //                 ...prevData,
+    //                 ref_name: userProfileData.user_name || prevData.ref_name, // Set ref_name
+    //                 ref_aadhar_number: userProfileData.aadhar_number || prevData.ref_aadhar_number, // Set ref_aadhar_number
                    
-                }));
-            }
-        } catch (err) {
-            console.error("Error occurred in fetching user profile", err);
-            // Handle error (optional: setError for displaying a message to the user)
-        }
-    };
+    //             }));
+    //         }
+    //     } catch (err) {
+    //         console.error("Error occurred in fetching user profile", err);
+           
+    //     }
+    // };
     
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this customer?')) {
             try {
-                await Axios.delete(`/customers/${id}`);
+                await Axios.delete(`/user/${id}`);
                 setcustomers(customer.filter(customer => customer.id !== id));
                 alert('customer deleted successfully!');
             } catch (error) {
@@ -136,14 +139,17 @@ const Customer = () => {
             qualification: customer.qualification,
             password: '',
             confirmPassword: '',
-            profile_photo: null,
+           
             designation: customer.designation || '',
             landmark: customer.landmark || '',
             alter_mobile_number: customer.alter_mobile_number || '',
             ref_name: customer.ref_number || '',
             ref_user_id: customer.ref_user_id || localStorage.getItem('user_id'),
             ref_aadhar_number: customer.ref_aadhar_number || '',
+            profile_photo: null,
             sign_photo: null,
+            nominee_photo:null,
+            nominee_sign:null,
         });
         setShowForm(true);
     };
@@ -166,22 +172,25 @@ const Customer = () => {
             password: '',
             confirmPassword: '',
             added_by: localStorage.getItem('user_id'),
-            profile_photo: null,
+           
             designation: '',
             landmark: '',
             alter_mobile_number: '',
             ref_name: '',
             ref_user_id: localStorage.getItem('user_id'),
             ref_aadhar_number: '',
+            profile_photo: null,
             sign_photo: null,
+            nominee_photo:null,
+            nominee_sign:null,
         });
         setShowForm(true);
     };
 
-        const handleChange = async (e) => {
-        const { name, files } = e.target;
+    const handleChange = async (e) => {
+        const { name, files, value } = e.target;
     
-        if (name === "profile_photo" && files.length > 0) {
+        if (files && files.length > 0 && (name === "profile_photo" || name === "nominee_sign" || name === "nominee_photo" || name === "sign_photo")) {
             const file = files[0];
     
             // Check if the selected file is an image
@@ -189,29 +198,27 @@ const Customer = () => {
                 const reader = new FileReader();
     
                 reader.onloadend = () => {
-                    // Set the profile_photo in the formData as a Base64 string
+                    // Set Base64 string in formData
                     setFormData((prevData) => ({
                         ...prevData,
-                        profile_photo: reader.result // This is the Base64 string
+                        [name]: reader.result 
+                        
                     }));
                 };
     
                 reader.readAsDataURL(file); // Convert file to Base64
             } else {
                 console.error("Selected file is not an image.");
-                // Optionally reset the input or show an error message
-                setFormData((prevData) => ({
-                    ...prevData,
-                    profile_photo: null // Reset or handle invalid file
-                }));
             }
         } else {
+            // For other fields, update the form data
             setFormData((prevData) => ({
                 ...prevData,
-                [name]: e.target.value // For other fields
+                [name]: value
             }));
         }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -227,7 +234,7 @@ const Customer = () => {
                 }
             }
             if (editingcustomer) {
-                await Axios.put(`/customer/${editingcustomer.id}`, formDataToSend);
+                await Axios.put(`/customer/${editingcustomer.user_id}`, formDataToSend);
                 alert('customer updated successfully!');
             } else {
                 await Axios.post('/register', formDataToSend);
@@ -254,7 +261,7 @@ const Customer = () => {
         const newStatus = employee.status === 'active' ? 'inactive' : 'active';
     
         try {
-            await Axios.put(`/employees/${employee.id}`, {
+            await Axios.put(`/employees/${employee.user_id}`, {
                 ...employee,
                 status: newStatus
             });
@@ -278,7 +285,9 @@ const Customer = () => {
               
                 <button className="small-button" onClick={handleAdd}>Add Customers</button>
                 <div className="table-container">
+                    
                         {Array.isArray(customer) && customer.map(customer => (
+                            <div className='maincard'>
                             <div key={customer.id} className={`employee-card ${expandedcustomerId === customer.id ? 'expanded' : ''}`}>
                                 <div className="employee-header" onClick={() => handleToggleExpand(customer.id)}>
                                     <div>
@@ -312,19 +321,21 @@ const Customer = () => {
                                         <div className="employee-detail-item">
                                 <span>Status:</span>
                                 <Switch
-    checked={customer.status === 'active'} // Check if status is 'active'
-    onChange={() => toggleEmployeeStatus(customer)}
-    color="primary"
-/>
+                            checked={customer.status === 'active'} // Check if status is 'active'
+                            onChange={() => toggleEmployeeStatus(customer)}
+                            color="primary"
+                        />
 
                             </div>
                                         <div className="employee-action-buttons">
                                             <EditIcon style={{color:"green"}} onClick={() => handleEdit(customer)} />
-                                            <DeleteIcon style={{color:"red"}} onClick={() => handleDelete(customer.id)} />
+                                            <DeleteIcon style={{color:"red"}} onClick={() => handleDelete(customer.user_id)} />
                                         </div>
                                     </div>
+                                    
                                 )}
                             </div>
+                          </div>
                         ))}
                     </div>
                 
@@ -334,12 +345,12 @@ const Customer = () => {
                         <h3>{editingcustomer ? 'Edit Customer' : 'Add Customer'}</h3>
                         <form onSubmit={handleSubmit}>
                             <div>
-                                <label>User ID:</label>
+                                <label>Customer ID:</label>
                                 <input type="text" name="user_id" value={formData.user_id} onChange={handleChange}  />
                                 {errors.user_id && <span className="error">{errors.user_id[0]}</span>}
                             </div>
                             <div>
-                                <label>User Name:</label>
+                                <label>Customer Name:</label>
                                 <input type="text" name="user_name" value={formData.user_name} onChange={handleChange}  />
                                 {errors.user_name && <span className="error">{errors.user_name[0]}</span>}
                             </div>
@@ -405,37 +416,62 @@ const Customer = () => {
                                 <input type="text" name="landmark" value={formData.landmark} onChange={handleChange} />
                                 {errors.landmark && <span className="error">{errors.landmark[0]}</span>}
                             </div>
+                          
                             <div>
-                                <label>Alternate Mobile Number:</label>
+                                <label>Nominee Name:</label>
+                                <input type="text" name="ref_name" value={formData.ref_name} onChange={handleChange} />
+                                {errors.ref_name && <span className="error">{errors.ref_name[0]}</span>}
+                            </div>
+                           
+                            <div>
+                                <label>Nominee Aadhar Number:</label>
+                                <input type="text" name="ref_aadhar_number" value={formData.ref_aadhar_number} onChange={handleChange} />
+                                {errors.ref_aadhar_number && <span className="error">{errors.ref_aadhar_number[0]}</span>}
+                            </div> 
+                             <div>
+                                <label>Nominee Mobile Number:</label>
                                 <input type="text" name="alter_mobile_number" value={formData.alter_mobile_number} onChange={handleChange}  />
                                 {errors.alter_mobile_number && <span className="error">{errors.alter_mobile_number[0]}</span>}
                                 
-                            </div>
-                            <div>
-                                <label>Reference Name:</label>
-                                <input type="text" name="ref_name" value={formData.ref_name} onChange={handleChange} />
-                                {errors.ref_name && <span className="error">{errors.ref_name[0]}</span>}
                             </div>
                             <div>
                                 <label>Reference User ID:</label>
                                 <input type="text" name="ref_user_id" value={formData.ref_user_id} onChange={handleChange} />
                                 {errors.ref_user_id && <span className="error">{errors.ref_user_id[0]}</span>}
                             </div>
-                            <div>
-                                <label>Reference Aadhar Number:</label>
-                                <input type="text" name="ref_aadhar_number" value={formData.ref_aadhar_number} onChange={handleChange} />
-                                {errors.ref_aadhar_number && <span className="error">{errors.ref_aadhar_number[0]}</span>}
-                            </div>
-                            <div>
-                                <label>Profile Photo:</label>
-                                <input type="file" name="profile_photo" onChange={handleChange} accept="image/*" />
-                                {errors.profile_photo && <span className="error">{errors.profile_photo[0]}</span>}
-                            </div>
-                            <div>
-                                <label>Signature Photo:</label>
-                                <input type="file" name="sign_photo" onChange={handleChange} accept="image/*" />
-                                {errors.sign_photo && <span className="error">{errors.sign_photo[0]}</span>}
-                            </div>
+                            
+                            <div class="customer-nominee-container">
+   
+    <div class="customer-section">
+      
+        <div>
+            <label>Customer Photo:</label>
+            <input type="file" name="profile_photo" onChange={handleChange} accept="image/*" />
+            {errors.profile_photo && <span className="error">{errors.profile_photo[0]}</span>}
+        </div>
+        <div>
+            <label>Customer Sign:</label>
+            <input type="file" name="sign_photo" onChange={handleChange} accept="image/*" />
+            {errors.sign_photo && <span className="error">{errors.sign_photo[0]}</span>}
+        </div>
+    </div>
+
+  
+    <div class="nominee-section">
+        
+        <div>
+            <label>Nominee Photo:</label>
+            <input type="file" name="nominee_photo" onChange={handleChange} accept="image/*" />
+            {errors.nominee_photo && <span className="error">{errors.nominee_photo[0]}</span>}
+        </div>
+        <div>
+            <label>Nominee Sign:</label>
+            <input type="file" name="nominee_sign" onChange={handleChange} accept="image/*" />
+            {errors.nominee_sign && <span className="error">{errors.nominee_sign[0]}</span>}
+        </div>
+    </div>
+</div>
+
                             <button type="submit">{editingcustomer ? 'Update Customer' : 'Add Customer'}</button>
                             <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
                         </form>

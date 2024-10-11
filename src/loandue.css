@@ -1,0 +1,98 @@
+/* Container for table cells */
+td {
+    padding: 8px; /* Adds padding inside table cells */
+    text-align: left; /* Aligns text to the left */
+    vertical-align: middle; /* Aligns the contents vertically in the middle */
+}
+
+/* Date input field styling */
+input[type="date"] {
+    background-color: mediumseagreen;
+    padding: 6px 8px; /* Adjusts the padding for the date input */
+    font-size: 14px; /* Sets a consistent font size */
+    border: 1px solid #ccc; /* Light border around the input */
+    border-radius: 4px; /* Rounds the corners slightly */
+    width: 100%; /* Make it fill the table cell */
+    box-sizing: border-box; /* Ensures padding and border are included in the width */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Dropdown select styling */
+select {
+    background-color: mediumseagreen;
+    padding: 6px 8px; /* Adjusts padding inside the dropdown */
+    font-size: 14px; /* Consistent font size with the date input */
+    border: 1px solid #ccc; /* Light border around the dropdown */
+    border-radius: 4px; /* Rounds the corners */
+    width: 100%; /* Make it fill the table cell */
+    box-sizing: border-box; /* Ensures padding and border are included in the width */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Optional: Add hover effect for inputs and select */
+input[type="date"]:hover,
+select:hover {
+    border-color: #7f223d; /* Change border color on hover */
+    background-color: white;
+}
+
+/* Optional: Style for focused elements */
+input[type="date"]:focus,
+select:focus {
+    background-color: white !important;
+    outline: none;
+    border-color: #7f223d; /* Focus border color */
+    box-shadow: 0 0 3px rgba(127, 34, 61, 0.5); /* Slight shadow to indicate focus */
+}
+
+/* loandue.css */
+
+.input-number {
+    background-color: mediumseagreen;
+    width: 100%; /* Full width */
+    padding: 6px; /* Padding around the text */
+    border: 1px solid #ccc; /* Light grey border */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    box-sizing: border-box; /* Ensures padding is included in total width/height */
+}
+
+/* Optional: Add styles for focus state */
+.input-number:focus {
+    background-color: white !important;
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle shadow */
+}
+.input-number:hover {
+    background-color: white !important;
+}
+
+
+
+.status-select {
+    width: 100%; /* Full width */
+    padding: 6px; /* Padding around the text */
+    /* border: 1px solid #ccc;  */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Change cursor to pointer */
+    box-sizing: border-box; /* Ensures padding is included in total width/height */
+}
+
+/* Optional: Add styles for focus state */
+.status-select:focus {
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle shadow */
+}
+
+/* Optional: Responsive adjustments */
+@media (max-width: 600px) {
+    .input-number {
+        font-size: 14px; /* Smaller font size on smaller screens */
+    }
+    .status-select {
+        font-size: 14px; /* Smaller font size on smaller screens */
+    }
+}

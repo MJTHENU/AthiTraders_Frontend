@@ -1,0 +1,27 @@
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px; /* Consolidated */
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    margin-left: 10px !important;
+}
+
+.searchbox {
+    padding: 5px 10px;
+    margin-right: 100px !important;
+    width: 500px;
+}
+
+.form-field {
+    width: 100%; /* Make fields take full width */
+    height: 40px; /* Set a fixed height */
+    padding: 10px; /* Add some padding */
+    margin-bottom: 16px; /* Space between fields */
+    border: 1px solid #ccc; /* Optional: border styling */
+    border-radius: 4px; /* Optional: rounded corners */
+    box-sizing: border-box; /* Include padding and border in width */
+}

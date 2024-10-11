@@ -103,7 +103,7 @@ const Employee = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this employee?')) {
             try {
-                await Axios.delete(`/employees/${id}`);
+                await Axios.delete(`/user/${id}`);
                 setEmployees(employees.filter(employee => employee.id !== id));
                 alert('Employee deleted successfully!');
             } catch (error) {
@@ -226,7 +226,7 @@ const Employee = () => {
             }
 
             // API call for adding/updating employee
-            await (editingEmployee ? Axios.put(`/employees/${editingEmployee.id}`, formDataToSend) : Axios.post('/register', formDataToSend));
+            await (editingEmployee ? Axios.put(`/employees/${editingEmployee.user_id}`, formDataToSend) : Axios.post('/register', formDataToSend));
 
             alert('Employee submitted successfully!');
             setErrors({}); // Clear errors on successful submission
@@ -250,7 +250,7 @@ const Employee = () => {
         const newStatus = employee.status === 'active' ? 'inactive' : 'active';
     
         try {
-            await Axios.put(`/employees/${employee.id}`, {
+            await Axios.put(`/employees/${employee.user_id}`, {
                 ...employee,
                 status: newStatus
             });
@@ -277,8 +277,11 @@ const Employee = () => {
                     {/* <h2>Employee List</h2> */}
                     <button className="small-button" onClick={handleAdd}>Add Employee</button>
                     <div className="table-container">
+                        
                         {Array.isArray(employees) && employees.map(employee => (
-                            <div key={employee.id} className={`employee-card ${expandedEmployeeId === employee.id ? 'expanded' : ''}`}>
+                            <div className='maincard'>
+                            <div key={employee.id} className={`employee-card ${expandedEmployeeId === employee.id ? 'expanded' : ''}`}
+                            >
                                 <div className="employee-header" onClick={() => handleToggleExpand(employee.id)}>
                                     <div>
                                         <img
@@ -311,18 +314,19 @@ const Employee = () => {
                                         <div className="employee-detail-item">
                                 <span>Status:</span>
                                 <Switch
-    checked={employee.status === 'active'} // Check if status is 'active'
-    onChange={() => toggleEmployeeStatus(employee)}
-    color="primary"
-/>
+                                        checked={employee.status === 'active'} // Check if status is 'active'
+                                        onChange={() => toggleEmployeeStatus(employee)}
+                                        color="primary"
+                                    />
 
-                            </div>
+                                    </div>
                                         <div className="employee-action-buttons">
                                             <EditIcon style={{color:"green"}} onClick={() => handleEdit(employee)} />
                                             <DeleteIcon style={{color:"red"}} onClick={() => handleDelete(employee.id)} />
                                         </div>
                                     </div>
                                 )}
+                            </div>
                             </div>
                         ))}
                     </div>
@@ -335,12 +339,12 @@ const Employee = () => {
                                 {/* Form fields */}
                                 
                                 <div>
-                                    <label>User ID:</label>
+                                    <label>Employee ID:</label>
                                     <input type="text" name="user_id" value={formData.user_id} onChange={handleChange}  />
                                     {errors.user_id && <span className="error">{errors.user_id[0]}</span>}
                                 </div>
                                 <div>
-                                    <label>User Name:</label>
+                                    <label>Employee Name:</label>
                                     <input type="text" name="user_name" value={formData.user_name} onChange={handleChange}  />
                                     {errors.user_name && <span className="error">{errors.user_name[0]}</span>}
                                 </div>

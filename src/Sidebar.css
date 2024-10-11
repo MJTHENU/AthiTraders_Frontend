@@ -5,12 +5,13 @@
     margin-left: 200px !important; /* Push it to the right to account for the sidebar */
     z-index: 1201 !important; /* Keep AppBar on top of Drawer */
     position: fixed !important; /* Fix the AppBar at the top */
+    width: calc(100% - 200px); /* Full width minus the sidebar width */
 }
 
 .toolbar {
     display: flex !important; /* Flexbox for toolbar */
     justify-content: space-between !important; /* Space out items */
-    align-items: center  !important; /* Center items vertically */
+    align-items: center !important; /* Center items vertically */
 }
 
 .title {
@@ -26,27 +27,27 @@
 }
 
 .logo {
-    width: 60px !important;
-    height: 60px !important; /* Set logo height */
-    margin-left:-78px !important;/* Space between logo and title */
+    width:80px !important;
+    height: 80px !important; /* Set logo height */
+    margin-left: -78px !important; /* Space between logo and title */
 }
 
 .logout-button {
-    background-color:#188b3E !important;
+    background-color: #188b3E !important; /* Button background color */
     width: 100px !important;
     color: white; /* Logout button text color */
 }
 
 /* Sidebar.css */
+
 .sidebar {
-    padding-top: 50px !important;
-    width: 200px !important; /* Fixed width of the sidebar */
+    width: 200px !important;
     height: 100vh; /* Full height */
-    background-color: #f4f4f4 !important; /* Background color for the sidebar */
-    color: #188b3E !important;
-    position: fixed; /* Fix the sidebar to the left */
-    top: 40px;
-    left: 0;
+    background-color: #f4f4f4 !important; /* Sidebar background color */
+    position: fixed; /* Fixed sidebar */
+    top: 40px; /* Below the AppBar */
+    left: 0; /* Align to the left */
+    padding-top: 50px; /* Space at the top */
 }
 
 .sidebar .MuiListItemText-primary {
@@ -67,28 +68,50 @@
     padding-top: 80px !important; /* Add padding for the top so it doesn't overlap with the AppBar */
 }
 
-/* Add a class to ListItem for styling */
+/* Add hover effect with animation to list items */
 .list-item {
-    display: flex; /* Make sure it displays as flex to align items */
-    align-items: center; /* Center items vertically */
-    padding: 10px 16px; /* Padding inside the list item */
-    transition: background-color 0.3s; /* Smooth background transition */
-    cursor: pointer; /* Show pointer cursor on hover */
+    display: flex; /* Flex to align items */
+    align-items: center;
+    padding: 10px 16px; /* Padding for list items */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    cursor: pointer;
 }
 
-/* Hover effect */
 .list-item:hover {
-    background-color: #f0f0f0; /* Light background color on hover */
+    background-color: #e0e0e0; /* Light background color on hover */
+    transform: scale(1.25); /* Slightly enlarge the item on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 }
 
-/* Style for the arrow icon */
 .arrow-icon {
     margin-left: auto; /* Push the arrow to the far right */
     opacity: 0; /* Hide the arrow by default */
-    transition: opacity 0.3s; /* Smooth transition for arrow visibility */
+    transition: opacity 0.3s, transform 0.3s; /* Smooth transition for visibility and movement */
 }
 
-/* Show the arrow icon on hover */
 .list-item:hover .arrow-icon {
-    opacity: 1; /* Show the arrow icon on hover */
+    opacity: 1; /* Show arrow icon on hover */
+    transform: translateX(5px); /* Move arrow slightly to the right */
+}
+
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 195px !important; /* Optional: Increase the sidebar width on mobile */
+        padding-top: 20px; /* Reduce padding at the top for mobile */
+    }
+
+    .appContent {
+        margin-left: 0 !important; /* No fixed margin for mobile */
+        padding-top: 20px !important; /* Adjust padding for mobile */
+    }
+
+    .app-bar {
+        margin-left: 0 !important; /* Remove left margin on mobile */
+        width: 100%; /* Full width */
+    }
+
+    .logout-button {
+        display: none; /* Hide the logout button in mobile view */
+    }
 }
